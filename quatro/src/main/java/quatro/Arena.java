@@ -99,7 +99,7 @@ public class Arena {
 		while (!done) {
 
 			calculateHighScore();
-			if (fighters.size() == 1) {
+			if (fighters.size() <= 1) {
 				done = true;
 				break;
 			}
@@ -150,21 +150,27 @@ public class Arena {
 		System.out.println(">---------------< LAST ONE STANDING >---------------<");
 		System.out.println(">---------------------------------------------------<");
 
-		Fighter lastOne = fighters.get(0);
-		lastOne.stats(highScoreHonor);
+		if (fighters.size() > 0) {
+			Fighter lastOne = fighters.get(0);
+			lastOne.stats(highScoreHonor);
+		}
 
 		System.out.println();
 		calculateBloodLevel();
 	}
 
 	private void calculateBloodLevel() {
-		double blood = fighters.get(0).lookAtBlood();
+		double blood = 0;
+		if (fighters.size() > 0) {
+
+			blood = fighters.get(0).lookAtBlood();
+		}
 		double wastedLife = 0;
 		for (Fighter corps : chronicles) {
 			blood += corps.lookAtBlood();
 			wastedLife += corps.getMaxHealth();
 		}
-		System.out.println(chronicles.size() + 1 + " fighters lost " + (int) blood + " in blood and " + (int) wastedLife
+		System.out.println(chronicles.size() + " fighters lost " + (int) blood + " in blood and " + (int) wastedLife
 				+ " life was wasted overall.");
 	}
 

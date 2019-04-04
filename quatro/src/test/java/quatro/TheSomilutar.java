@@ -9,15 +9,31 @@ public class TheSomilutar {
 	private static int numberOfFighters;
 	private static int minimumBluntness;
 	private static int varietyOfWeapons;
+	private static long start;
 
 	public static void main(String[] args) {
+		_EXECUTE();
+	}
+
+	private static void _EXECUTE() {
 		defineParameters();
 		initializeArena();
 		awaitResults();
+		displayCalculation();
+	}
 
+	private static void displayCalculation() {
+		System.out.println(numberOfFighters + " fighters battled with weapons of strength " + minimumBluntness + " to "
+				+ (minimumBluntness + varietyOfWeapons) + "." + "\n -> Well, this battle took " + calculateTime()
+				+ " seconds.");
+	}
+
+	private static double calculateTime() {
+		return (System.currentTimeMillis() - start) / 1000;
 	}
 
 	private static void awaitResults() {
+		start = System.currentTimeMillis();
 		arena.lastManStanding();
 	}
 
@@ -41,7 +57,7 @@ public class TheSomilutar {
 	}
 
 	private static void countDown() {
-		for (int i = 10; i > 0; i--) {
+		for (int i = 3; i > 0; i--) {
 			System.out.println("Somilutar starting in " + i + ".");
 			try {
 				TimeUnit.SECONDS.sleep(1);
