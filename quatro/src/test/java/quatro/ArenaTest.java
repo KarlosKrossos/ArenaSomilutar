@@ -64,7 +64,7 @@ public class ArenaTest {
 	public void newArenaHasAtLeastOneWeapon() {
 		System.out.println("+++++newArenaHasAtLeastOneWeapon++++++");
 		Arena arena = new Arena();
-		assertTrue(arena.weapons.size() >= 1);
+		assertTrue(arena.countWeapons() >= 1);
 	}
 
 	@Test
@@ -86,7 +86,6 @@ public class ArenaTest {
 		try {
 			klauer.dropWeapon();
 		} catch (DroppedWeaponException e) {
-			e.printStackTrace();
 		}
 		assertEquals(0, klauer.getWeaponStrength());
 		assertTrue(arena.requestEnterance(new Fighter()));
@@ -101,7 +100,6 @@ public class ArenaTest {
 		try {
 			opfer.dropWeapon();
 		} catch (DroppedWeaponException e) {
-			e.printStackTrace();
 		}
 		assertEquals(0, opfer.getWeaponStrength());
 		Fighter stronger = new Fighter();

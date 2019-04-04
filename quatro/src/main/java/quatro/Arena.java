@@ -6,10 +6,10 @@ import java.util.List;
 
 public class Arena {
 
-	List<Fighter> fighters = new ArrayList<Fighter>();
-	List<Integer> weapons = new ArrayList<Integer>();
-	List<Fighter> chronicles = new ArrayList<Fighter>();
-	int highScoreHonor;
+	private List<Fighter> fighters = new ArrayList<Fighter>();
+	private List<Integer> weapons = new ArrayList<Integer>();
+	private List<Fighter> chronicles = new ArrayList<Fighter>();
+	private int highScoreHonor;
 
 	public Arena() {
 		while (weapons.isEmpty()) {
@@ -145,10 +145,13 @@ public class Arena {
 
 	private void calculateBloodLevel() {
 		double blood = fighters.get(0).lookAtBlood();
+		double wastedLife = 0;
 		for (Fighter corps : chronicles) {
 			blood += corps.lookAtBlood();
+			wastedLife += corps.getMaxHealth();
 		}
-		System.out.println(chronicles.size() + 1 + " fighters lost " + (int) blood + " in blood");
+		System.out.println(chronicles.size() + 1 + " fighters lost " + (int) blood + " in blood and " + (int) wastedLife
+				+ " life overall.");
 	}
 
 	private void calculateHighScore() {
@@ -229,6 +232,10 @@ public class Arena {
 			addWeapon(soStrong);
 			System.out.println(soStrong + " was thrown into the arena");
 		}
+	}
+
+	public int countWeapons() {
+		return weapons.size();
 	}
 
 	public void addWeapon(Integer weapon) {
