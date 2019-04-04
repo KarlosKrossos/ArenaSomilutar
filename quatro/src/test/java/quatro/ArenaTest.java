@@ -105,12 +105,14 @@ public class ArenaTest {
 		}
 		assertEquals(0, opfer.getWeaponStrength());
 		Fighter stronger = new Fighter();
-		stronger.pickUpWeapon(new Integer(1000));
 
 		boolean tooWeak = true;
 		while (tooWeak) {
 			tooWeak = stronger.getOverallStrength() < opfer.getOverallStrength();
+			stronger = new Fighter();
 		}
+		stronger.pickUpWeapon(new Integer(1000));
+
 		arena.requestEnterance(stronger);
 		arena.lastManStanding();
 		assertEquals(0, opfer.chickenDinner());
