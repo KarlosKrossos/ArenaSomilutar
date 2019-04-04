@@ -10,8 +10,22 @@ public class Arena {
 	private List<Integer> weapons = new ArrayList<Integer>();
 	private List<Fighter> chronicles = new ArrayList<Fighter>();
 	private int highScoreHonor;
+	private int minimumBluntness = 1;
+	private int varietyOfWeapons = 10;
 
 	public Arena() {
+		provideMinimumWeapons();
+	}
+
+	public Arena(int minimumBluntness, int varietyOfWeapons) {
+		if (minimumBluntness >= 0)
+			this.minimumBluntness = minimumBluntness;
+		if (varietyOfWeapons >= 0)
+			this.varietyOfWeapons = varietyOfWeapons;
+		provideMinimumWeapons();
+	}
+
+	private void provideMinimumWeapons() {
 		while (weapons.isEmpty()) {
 			addWeaponsMaybe();
 		}
@@ -151,7 +165,7 @@ public class Arena {
 			wastedLife += corps.getMaxHealth();
 		}
 		System.out.println(chronicles.size() + 1 + " fighters lost " + (int) blood + " in blood and " + (int) wastedLife
-				+ " life overall.");
+				+ " life was wasted overall.");
 	}
 
 	private void calculateHighScore() {
@@ -243,7 +257,7 @@ public class Arena {
 	}
 
 	private Integer defineDanger() {
-		return new Integer((int) (Math.random() * 10) + 1);
+		return new Integer((int) (Math.random() * varietyOfWeapons) + minimumBluntness);
 	}
 
 	private void fight(int i, int j) {
