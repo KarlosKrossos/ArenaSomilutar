@@ -13,6 +13,7 @@ public class Fighter {
 	private static final int W20 = 20;
 	private static final int W6 = 6;
 	private String name;
+	private String nameText;
 	private double maxHealth;
 	private double talent;
 	private double adjustedTalent;
@@ -31,8 +32,10 @@ public class Fighter {
 	private int motivators = 1;
 	private int lazyRounds;
 	private int survivedRounds;
+	// FIXME roundsFought is not incremented correctly
 	private int roundsFought;
 
+	private double damageTakenSoFar;
 	private double bloodLostSoFar;
 	private boolean readyForComma = false;
 
@@ -52,19 +55,19 @@ public class Fighter {
 		if (null != dangerLevel && 0 < dangerLevel) {
 			if (null == weaponStrength) {
 				weaponStrength = dangerLevel;
-				LOG.debug(name + " equipped " + dangerLevel + ".");
+				LOG.debug(nameText + " equipped " + dangerLevel + ".");
 				return null;
 			} else if (dangerLevel.intValue() > weaponStrength.intValue()) {
 				Integer dropped = weaponStrength;
 				weaponStrength = dangerLevel;
-				LOG.debug(name + " dropped " + dropped + " and replaced it with " + dangerLevel + ".");
+				LOG.debug(nameText + " dropped " + dropped + " and replaced it with " + dangerLevel + ".");
 				return dropped;
 			} else {
-				LOG.debug(name + " ignored " + dangerLevel);
+				LOG.trace(nameText + " ignored " + dangerLevel);
 				return dangerLevel;
 			}
 		} else {
-			LOG.debug(name + " cannot see any useful weapons lying about. (" + dangerLevel + ")");
+			LOG.debug(nameText + " cannot see any useful weapons lying about. (" + dangerLevel + ")");
 			return dangerLevel;
 		}
 	}
@@ -77,11 +80,11 @@ public class Fighter {
 			if (dead) {
 				LOG.debug(name + "'s" + "\t" + "dead hand dropped " + dangerousThing + ".");
 			} else {
-				LOG.debug(name + "\t" + "fumbled and dropped " + dangerousThing + ".");
+				LOG.debug(nameText + "fumbled and dropped " + dangerousThing + ".");
 			}
 			throw new DroppedWeaponException(dangerousThing);
 		} else {
-			LOG.debug(name + "\thas no weapon.");
+			LOG.debug(nameText + "has no weapon.");
 		}
 
 	}
@@ -109,6 +112,7 @@ public class Fighter {
 		ng.setMultiple(true);
 		ng.setExtentionChance(0.1);
 		name = ng.generateNameAdv();
+		nameText = name + "\t";
 	}
 
 	public void battle(double opponentStrength) throws DroppedWeaponException {
@@ -119,6 +123,7 @@ public class Fighter {
 
 			double damageTaken = calculateDamage(opponentStrength);
 			strength -= damageTaken;
+			damageTakenSoFar += damageTaken;
 			honor += calculateGainOfHonor(damageTaken);
 			takeWound(damageTaken);
 		}
@@ -145,8 +150,8 @@ public class Fighter {
 		if (gainOfHonor <= 0)
 			gainOfHonor = 1;
 
-		LOG.debug(name + "\t" + "has gained " + gainOfHonor + " honor - winner of " + chickenDinner() + "/"
-				+ roundsFought + " rounds.");
+		LOG.debug(nameText + "has gained " + gainOfHonor + " honor - winner of " + chickenDinner() + "/" + roundsFought
+				+ " rounds.");
 		return gainOfHonor;
 	}
 
@@ -159,41 +164,42 @@ public class Fighter {
 		bloodLostSoFar += bleeding;
 		strength -= bleeding;
 		countWounds();
+		bleedingStats(bleeding);
 	}
 
-	public void bleedingStats(double bleeding) {
+	private void bleedingStats(double bleeding) {
 		if (bleeding < 0.3 && bleeding > 0) {
-			LOG.debug(this.name + "\t" + "has some scratches.");
+			LOG.debug(nameText + "has some scratches.");
 		} else if (bleeding < 1) {
-			LOG.debug(this.name + "\t" + "is bleeding.");
+			LOG.debug(nameText + "is bleeding.");
 		} else if (bleeding < 2) {
-			LOG.debug(this.name + "\t" + "is covered in blood.");
+			LOG.debug(nameText + "is covered in blood.");
 		} else if (bleeding < 0) {
-			LOG.debug(this.name + "\t" + "is RENEGERATING??!");
+			LOG.debug(nameText + "is RENEGERATING??!");
 		} else {
-			LOG.debug(this.name + "\t" + "is SPRAYING blood.");
+			LOG.debug(nameText + "is SPRAYING blood.");
 		}
 	}
 
 	private void healthStats() {
 		StringBuilder healthStatus = new StringBuilder();
 		if (strength > 0.9 * maxHealth) {
-			healthStatus.append(this.name + "\t" + "is feeling fine.");
+			healthStatus.append(nameText + "is feeling fine.");
 		} else if (strength > 0.6 * maxHealth) {
-			healthStatus.append(this.name + "\t" + "might wanna check with a doctor.");
+			healthStatus.append(nameText + "might wanna check with a doctor.");
 		} else if (strength > 0.3 * maxHealth) {
-			healthStatus.append(this.name + "\t" + "looks really, really unwell.");
+			healthStatus.append(nameText + "looks really, really unwell.");
 		} else if (strength > 0) {
-			healthStatus.append(this.name + "\t" + "is on the brink of death.");
+			healthStatus.append(nameText + "is on the brink of death.");
 		} else {
-			healthStatus.append(this.name + "\t" + "has stopped breathing.");
+			healthStatus.append(nameText + "has stopped breathing.");
 		}
 		LOG.debug(healthStatus);
 	}
 
 	private void takeWound(double damage) {
 		StringBuilder damageTaken = new StringBuilder();
-		damageTaken.append(name + "\t" + "has taken ");
+		damageTaken.append(nameText + "has taken ");
 		if (damage < 0) {
 			damageTaken.append("negative?");
 		} else if (damage == 0) {
@@ -272,16 +278,16 @@ public class Fighter {
 
 	private void situationStats() {
 		StringBuilder situation = new StringBuilder();
-		situation.append(name + "\t");
+		situation.append(nameText);
 		if (dead) {
 			situation.append("had ");
 		} else {
 			situation.append("has ");
 		}
 
-		situation.append((int) strength + " of " + (int) maxHealth + " left: ");
+		situation.append((int) strength + " of " + lookAtMaxHealth() + " left: ");
 		situation.append(getStrengthStats());
-		LOG.debug(situation);
+		LOG.trace(situation);
 	}
 
 	private void winnerStats() {
@@ -291,17 +297,19 @@ public class Fighter {
 		} else if (wonAgainstCleanedUp.size() > 1) {
 			LOG.debug(detailSituation() + " opponents: " + wonAgainstCleanedUp);
 		} else if (roundsFought > 1) {
-			LOG.debug("In " + howManyFightsThough() + ", " + name + "\t" + "has never won.");
+			LOG.debug("In " + howManyFightsThough() + ", " + nameText + "has never won.");
 		} else {
-			LOG.debug(name + "\t" + "has lost the first and only fight.");
+			LOG.debug(nameText + "has lost the first and only fight.");
 		}
 	}
 
 	private String detailSituation() {
 		if (chickenDinner() > 1) {
-			return name + "\thas won " + chickenDinner() + " times in " + howManyFightsThough() + " against " + loosers;
+			return nameText + "has won " + chickenDinner() + " times in " + howManyFightsThough() + " against "
+					+ loosers;
 		} else {
-			return name + "\thas won " + chickenDinner() + " time in " + howManyFightsThough() + " against " + loosers;
+			return nameText + "has won " + chickenDinner() + " time in " + howManyFightsThough() + " against "
+					+ loosers;
 		}
 	}
 
@@ -324,26 +332,25 @@ public class Fighter {
 
 	private void finalStats(int highScoreHonor) {
 		StringBuilder kindOfDeath = new StringBuilder();
-		String wayOfEnding = "fought";
-		if (dead)
-			wayOfEnding = "died";
+		String wayOfEnding = dead ? "died" : "fought";
+		kindOfDeath.append(honor + ": " + nameText + "has " + wayOfEnding);
 		if (honor <= 0) {
-			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " without honor");
+			kindOfDeath.append(" without honor");
 		} else if (honor > highScoreHonor * 0.3) {
-			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " like a hero");
+			kindOfDeath.append(" as a hero");
 		} else if (honor > highScoreHonor * 0.1) {
-			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " like a champion");
+			kindOfDeath.append(" like a champion");
 		} else if (honor > highScoreHonor * 0.01) {
-			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " bravely");
+			kindOfDeath.append(" bravely");
 		} else if (honor > 0) {
-			kindOfDeath.append(name + "\t" + "has died in vane");
+			kindOfDeath.append(" in vane");
 		}
 		kindOfDeath.append(" in round " + survivedRounds + ".\t");
 		LOG.debug(kindOfDeath);
 	}
 
 	public int countWounds() {
-		String pokies = this.name + "\thas lost " + countDrops() + " blood";
+		String pokies = nameText + "has lost " + countDrops() + " blood";
 		int woundCount = woundsSuperficial + woundsDeep + woundsCritical + woundsBrutal + woundsDisastrous;
 		readyForComma = false;
 		if (woundCount == 0) {
@@ -387,7 +394,11 @@ public class Fighter {
 	}
 
 	public double lookAtBlood() {
-		return bloodLostSoFar;
+		return Math.round(bloodLostSoFar);
+	}
+
+	public double lookAtDamage() {
+		return Math.round(damageTakenSoFar);
 	}
 
 	private String doTheComma() {
@@ -480,8 +491,8 @@ public class Fighter {
 		return !dead;
 	}
 
-	public double getMaxHealth() {
-		return maxHealth;
+	public double lookAtMaxHealth() {
+		return Math.round(maxHealth);
 	}
 
 }

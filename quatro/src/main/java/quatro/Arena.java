@@ -26,9 +26,9 @@ public class Arena {
 	}
 
 	public Arena(int minimumBluntness, int varietyOfWeapons) {
-		if (minimumBluntness >= 0)
+		if (minimumBluntness > 0)
 			this.minimumBluntness = minimumBluntness;
-		if (varietyOfWeapons >= 0)
+		if (varietyOfWeapons > 0)
 			this.varietyOfWeapons = varietyOfWeapons;
 		provideMinimumWeapons();
 	}
@@ -170,6 +170,11 @@ public class Arena {
 		if (!fighters.isEmpty()) {
 			Fighter lastOne = fighters.get(0);
 			lastOne.stats(highScoreHonor);
+			LOG.debug(lastOne + " gained " + lastOne.getHonor() + " honor. The fighter with the most has "
+					+ highScoreHonor + ".");
+			LOG.debug(lastOne + " lost " + lastOne.lookAtBlood() + " blood and " + lastOne.lookAtDamage()
+					+ " life overall.");
+			LOG.debug(lastOne + ", when in his full powers, has " + lastOne.lookAtMaxHealth() + " health.");
 		}
 
 		calculateBloodLevel();
@@ -183,7 +188,7 @@ public class Arena {
 		double wastedLife = 0;
 		for (Fighter corps : chronicles) {
 			blood += corps.lookAtBlood();
-			wastedLife += corps.getMaxHealth();
+			wastedLife += corps.lookAtMaxHealth();
 		}
 		LOG.debug(chronicles.size() + " fighters lost " + (int) blood + " in blood and " + (int) wastedLife
 				+ " life was wasted overall.");
@@ -295,8 +300,6 @@ public class Arena {
 		double bOverallStrength = w.getOverallStrength();
 		LOG.debug(s.getName() + s.getStrengthStats() + " fought " + w.getName() + w.getStrengthStats() + " and won.");
 
-		s.praise(w);
-
 		try {
 			w.battle(aOverallStrength);
 			s.battle(bOverallStrength);
@@ -305,6 +308,7 @@ public class Arena {
 				weapons.add(e.getWeapon());
 		}
 
+		s.praise(w);
 	}
 
 }
