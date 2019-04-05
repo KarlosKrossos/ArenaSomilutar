@@ -90,7 +90,7 @@ public class Arena {
 		if (weapons.size() == 1) {
 			return 0;
 		} else if (weapons.size() > 1) {
-			return r.nextInt() * (weapons.size() - 1);
+			return r.nextInt(weapons.size() - 1);
 		} else {
 			return -1;
 		}
@@ -102,7 +102,7 @@ public class Arena {
 
 		int round = 0;
 
-		while (fighters.size() <= 1) {
+		while (fighters.size() > 1) {
 
 			calculateHighScore();
 
@@ -112,22 +112,40 @@ public class Arena {
 			removeDead();
 			motivateTheLiving();
 
-			LOG.debug("Living fighters: " + fighters.toString());
-			LOG.debug("Available weapons: " + weapons.toString());
+			LOG.debug("Living fighters: " + fighters);
+			LOG.debug("Available weapons: " + weapons);
 			letThemGatherWeapons();
 
 			if (fighters.size() == 2) {
 				fight(0, 1);
-			}
-			int a = r.nextInt() * fighters.size() - 1;
-			int b = r.nextInt() * fighters.size() - 1;
-			if (b != a) {
+			} else {
+				int a = r.nextInt(fighters.size() - 1);
+				int b = findOtherFighter(a);
 				fight(a, b);
 			}
-
 			removeDead();
 		}
 		wrapItUp();
+	}
+
+	private int findOtherFighter(int a) {
+		int count = fighters.size();
+		int b = r.nextInt(count - 1);
+		if (count == 2) {
+			if (a == 0) {
+				return 1;
+			} else if (count == 1) {
+				return 0;
+			} else {
+				LOG.error("COUNT out of BOUND");
+			}
+		} else {
+			while (a == b) {
+				b = r.nextInt(count - 1);
+				LOG.trace("A" + a + " against B" + b + " | " + count);
+			}
+		}
+		return b;
 	}
 
 	private void motivateTheLiving() {
@@ -263,7 +281,7 @@ public class Arena {
 	}
 
 	private Integer defineDanger() {
-		return new Integer(r.nextInt() * varietyOfWeapons) + minimumBluntness;
+		return new Integer(r.nextInt(varietyOfWeapons) + minimumBluntness);
 	}
 
 	private void fight(int i, int j) {

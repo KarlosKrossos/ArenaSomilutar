@@ -39,12 +39,6 @@ public class ArenaTest {
 		Arena arena = new Arena();
 		assertTrue(arena.requestEnterance(new Fighter()));
 		assertTrue(arena.requestEnterance(new Fighter()));
-		assertTrue(arena.requestEnterance(new Fighter()));
-		assertTrue(arena.requestEnterance(new Fighter()));
-		assertTrue(arena.requestEnterance(new Fighter()));
-		assertTrue(arena.requestEnterance(new Fighter()));
-		assertTrue(arena.requestEnterance(new Fighter()));
-		assertTrue(arena.requestEnterance(new Fighter()));
 		arena.lastManStanding();
 		assertFalse(arena.readyToFight());
 	}
@@ -114,7 +108,7 @@ public class ArenaTest {
 		arena.requestEnterance(stronger);
 		arena.lastManStanding();
 		assertEquals(0, opfer.chickenDinner());
-		assertEquals(1, stronger.chickenDinner());
+		assertTrue(stronger.chickenDinner() > 1);
 
 	}
 
