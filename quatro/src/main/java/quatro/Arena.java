@@ -3,12 +3,19 @@ package quatro;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 public class Arena {
 
-	private List<Fighter> fighters = new ArrayList<Fighter>();
-	private List<Integer> weapons = new ArrayList<Integer>();
-	private List<Fighter> chronicles = new ArrayList<Fighter>();
+	private static final Logger LOG = Logger.getLogger(Arena.class);
+	private final Random r = new Random();
+	private static final String SIGNBOARDEMPTY = ">---------------------------------------------------<";
+
+	private List<Fighter> fighters = new ArrayList<>();
+	private List<Integer> weapons = new ArrayList<>();
+	private List<Fighter> chronicles = new ArrayList<>();
 	private int highScoreHonor;
 	private int minimumBluntness = 1;
 	private int varietyOfWeapons = 10;
@@ -33,28 +40,28 @@ public class Arena {
 
 	public boolean requestEnterance(Fighter fighter) {
 		fighters.add(fighter);
-		System.out.println(fighter + " has entered.");
+		LOG.debug(fighter + " has entered.");
 		addWeaponsMaybe();
 		distributeWeapons(fighter);
-		System.out.println(fighters);
+		LOG.debug(fighters);
 
 		return true;
 	}
 
 	private void distributeWeapons(Fighter fighter) {
 
-		if (weapons.size() > 0) {
+		if (!weapons.isEmpty()) {
 
-			System.out.println(weapons);
+			LOG.debug(weapons);
 			if (fighters.size() == 1) {
 				giveWeapon(fighter);
 			} else {
-				System.out.println("REPLAAAACE!");
+				LOG.debug("REPLAAAACE!");
 				for (int i = 0; i < fighters.size(); i++) {
 					giveWeapon(fighters.get(i));
 				}
 			}
-			System.out.println(weapons);
+			LOG.debug(weapons);
 		}
 	}
 
@@ -83,7 +90,7 @@ public class Arena {
 		if (weapons.size() == 1) {
 			return 0;
 		} else if (weapons.size() > 1) {
-			return (int) (Math.random() * (weapons.size() - 1));
+			return r.nextInt() * (weapons.size() - 1);
 		} else {
 			return -1;
 		}
@@ -91,34 +98,29 @@ public class Arena {
 
 	public void lastManStanding() {
 
-		System.out.println("############################ UNTIL THE LAST STANDETH ! ! ############################");
+		LOG.debug("############################ UNTIL THE LAST STANDETH ! ! ############################");
 
-		boolean done = false;
 		int round = 0;
 
-		while (!done) {
+		while (fighters.size() <= 1) {
 
 			calculateHighScore();
-			if (fighters.size() <= 1) {
-				done = true;
-				break;
-			}
 
 			round++;
-			System.out.println("---------------------- round " + round + " ---------------------- ");
+			LOG.debug("---------------------- round " + round + " ---------------------- ");
 			spreadTheBlood();
 			removeDead();
 			motivateTheLiving();
 
-			System.out.println("Living fighters: " + fighters.toString());
-			System.out.println("Available weapons: " + weapons.toString());
+			LOG.debug("Living fighters: " + fighters.toString());
+			LOG.debug("Available weapons: " + weapons.toString());
 			letThemGatherWeapons();
 
 			if (fighters.size() == 2) {
 				fight(0, 1);
 			}
-			int a = (int) (Math.random() * fighters.size() - 1);
-			int b = (int) (Math.random() * fighters.size() - 1);
+			int a = r.nextInt() * fighters.size() - 1;
+			int b = r.nextInt() * fighters.size() - 1;
 			if (b != a) {
 				fight(a, b);
 			}
@@ -146,23 +148,22 @@ public class Arena {
 
 	private void showLastStanding() {
 
-		System.out.println(">---------------------------------------------------<");
-		System.out.println(">---------------< LAST ONE STANDING >---------------<");
-		System.out.println(">---------------------------------------------------<");
+		// TODO use constants and use append
+		LOG.debug(SIGNBOARDEMPTY);
+		LOG.debug(">---------------< LAST ONE STANDING >---------------<");
+		LOG.debug(SIGNBOARDEMPTY);
 
-		if (fighters.size() > 0) {
+		if (!fighters.isEmpty()) {
 			Fighter lastOne = fighters.get(0);
 			lastOne.stats(highScoreHonor);
 		}
 
-		System.out.println();
 		calculateBloodLevel();
 	}
 
 	private void calculateBloodLevel() {
 		double blood = 0;
-		if (fighters.size() > 0) {
-
+		if (!fighters.isEmpty()) {
 			blood = fighters.get(0).lookAtBlood();
 		}
 		double wastedLife = 0;
@@ -170,7 +171,7 @@ public class Arena {
 			blood += corps.lookAtBlood();
 			wastedLife += corps.getMaxHealth();
 		}
-		System.out.println(chronicles.size() + " fighters lost " + (int) blood + " in blood and " + (int) wastedLife
+		LOG.debug(chronicles.size() + " fighters lost " + (int) blood + " in blood and " + (int) wastedLife
 				+ " life was wasted overall.");
 	}
 
@@ -183,9 +184,9 @@ public class Arena {
 	}
 
 	private void writeTheChronicleBoard() {
-		System.out.println(">---------------------------------------------------<");
-		System.out.println(">-------------------< CHRONICLES >------------------<");
-		System.out.println(">---------------------------------------------------<");
+		LOG.debug(SIGNBOARDEMPTY);
+		LOG.debug(">-------------------< CHRONICLES >------------------<");
+		LOG.debug(SIGNBOARDEMPTY);
 
 		boolean lastOneWasPositive = true;
 		for (Fighter deadGuy : chronicles) {
@@ -193,7 +194,7 @@ public class Arena {
 				lastOneWasPositive = true;
 			}
 			if (deadGuy.getHonor() <= 0 && lastOneWasPositive) {
-				System.out.println("------------------------------");
+				LOG.debug("------------------------------");
 				lastOneWasPositive = false;
 			}
 			deadGuy.stats(highScoreHonor);
@@ -202,13 +203,12 @@ public class Arena {
 
 	private void removeDead() {
 
-		List<Fighter> fightersToBeRemoved = new ArrayList<Fighter>();
+		List<Fighter> fightersToBeRemoved = new ArrayList<>();
 
 		for (Fighter f : fighters) {
 			if (f.getStrength() < 0) {
 				try {
 					f.die();
-//					f.stats(highScoreHonor);
 				} catch (DroppedWeaponException e) {
 					if (null != e.getWeapon())
 						weapons.add(e.getWeapon());
@@ -250,7 +250,7 @@ public class Arena {
 		while (Math.random() < 0.25) {
 			Integer soStrong = defineDanger();
 			addWeapon(soStrong);
-			System.out.println(soStrong + " was thrown into the arena");
+			LOG.debug(soStrong + " was thrown into the arena");
 		}
 	}
 
@@ -263,7 +263,7 @@ public class Arena {
 	}
 
 	private Integer defineDanger() {
-		return new Integer((int) (Math.random() * varietyOfWeapons) + minimumBluntness);
+		return new Integer(r.nextInt() * varietyOfWeapons) + minimumBluntness;
 	}
 
 	private void fight(int i, int j) {
@@ -279,8 +279,7 @@ public class Arena {
 		Fighter w = fighters.get(weaker);
 		double aOverallStrength = s.getOverallStrength();
 		double bOverallStrength = w.getOverallStrength();
-		System.out.println(
-				s.getName() + s.getStrengthStats() + " fought " + w.getName() + w.getStrengthStats() + " and won.");
+		LOG.debug(s.getName() + s.getStrengthStats() + " fought " + w.getName() + w.getStrengthStats() + " and won.");
 
 		s.praise(w);
 

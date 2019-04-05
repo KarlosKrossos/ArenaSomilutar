@@ -4,21 +4,34 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class Fighter {
 
-	private int W20 = 20, W6 = 6;
+	private static final Logger LOG = Logger.getLogger(Fighter.class);
+
+	private static final int W20 = 20;
+	private static final int W6 = 6;
 	private String name;
 	private double maxHealth;
-	private double talent, adjustedTalent;
+	private double talent;
+	private double adjustedTalent;
 	private double strength;
 	private Integer weaponStrength;
 	private boolean dead = false;
-	private List<Fighter> wonAgainst = new ArrayList<Fighter>();
+	private List<Fighter> wonAgainst = new ArrayList<>();
 	private List<Fighter> wonAgainstCleanedUp;
 	private int loosers;
-	private int woundsSuperficial, woundsDeep, woundsCritical, woundsBrutal, woundsDisastrous;
-	private int honor, motivators = 1;
-	private int lazyRounds, survivedRounds, roundsFought;
+	private int woundsSuperficial;
+	private int woundsDeep;
+	private int woundsCritical;
+	private int woundsBrutal;
+	private int woundsDisastrous;
+	private int honor;
+	private int motivators = 1;
+	private int lazyRounds;
+	private int survivedRounds;
+	private int roundsFought;
 
 	private double bloodLostSoFar;
 	private boolean readyForComma = false;
@@ -39,19 +52,19 @@ public class Fighter {
 		if (null != dangerLevel && 0 < dangerLevel) {
 			if (null == weaponStrength) {
 				weaponStrength = dangerLevel;
-				System.out.println(name + " equipped " + dangerLevel + ".");
+				LOG.debug(name + " equipped " + dangerLevel + ".");
 				return null;
 			} else if (dangerLevel.intValue() > weaponStrength.intValue()) {
 				Integer dropped = weaponStrength;
 				weaponStrength = dangerLevel;
-				System.out.println(name + " dropped " + dropped + " and replaced it with " + dangerLevel + ".");
+				LOG.debug(name + " dropped " + dropped + " and replaced it with " + dangerLevel + ".");
 				return dropped;
 			} else {
-				System.out.println(name + " ignored " + dangerLevel);
+				LOG.debug(name + " ignored " + dangerLevel);
 				return dangerLevel;
 			}
 		} else {
-			System.out.println(name + " cannot see any useful weapons lying about. (" + dangerLevel + ")");
+			LOG.debug(name + " cannot see any useful weapons lying about. (" + dangerLevel + ")");
 			return dangerLevel;
 		}
 	}
@@ -62,13 +75,13 @@ public class Fighter {
 
 		if (null != dangerousThing) {
 			if (dead) {
-				System.out.println(name + "'s" + "\t" + "dead hand dropped " + dangerousThing + ".");
+				LOG.debug(name + "'s" + "\t" + "dead hand dropped " + dangerousThing + ".");
 			} else {
-				System.out.println(name + "\t" + "fumbled and dropped " + dangerousThing + ".");
+				LOG.debug(name + "\t" + "fumbled and dropped " + dangerousThing + ".");
 			}
 			throw new DroppedWeaponException(dangerousThing);
 		} else {
-			System.out.println(name + "\thas no weapon.");
+			LOG.debug(name + "\thas no weapon.");
 		}
 
 	}
@@ -136,7 +149,7 @@ public class Fighter {
 		if (gainOfHonor <= 0)
 			gainOfHonor = 1;
 
-		System.out.println(name + "\t" + "has gained " + gainOfHonor + " honor - winner of " + chickenDinner() + "/"
+		LOG.debug(name + "\t" + "has gained " + gainOfHonor + " honor - winner of " + chickenDinner() + "/"
 				+ roundsFought + " rounds.");
 		return gainOfHonor;
 	}
@@ -154,56 +167,61 @@ public class Fighter {
 
 	public void bleedingStats(double bleeding) {
 		if (bleeding == 0) {
-			// System.out.println(this.name + " has flawless skin.");
+			// LOG.debug(this.name + " has flawless skin.");
 		} else if (bleeding < 0.3 && bleeding > 0) {
-			System.out.println(this.name + "\t" + "has some scratches.");
+			LOG.debug(this.name + "\t" + "has some scratches.");
 		} else if (bleeding < 1) {
-			System.out.println(this.name + "\t" + "is bleeding.");
+			LOG.debug(this.name + "\t" + "is bleeding.");
 		} else if (bleeding < 2) {
-			System.out.println(this.name + "\t" + "is covered in blood.");
+			LOG.debug(this.name + "\t" + "is covered in blood.");
 		} else if (bleeding < 0) {
-			System.out.println(this.name + "\t" + "is RENEGERATING??!");
+			LOG.debug(this.name + "\t" + "is RENEGERATING??!");
 		} else {
-			System.out.println(this.name + "\t" + "is SPRAYING blood.");
+			LOG.debug(this.name + "\t" + "is SPRAYING blood.");
 		}
 	}
 
 	private void healthStats(double before, double after) {
+		StringBuilder healthStatus = new StringBuilder();
 		if (strength > 0.9 * maxHealth) {
-			System.out.print(this.name + "\t" + "is feeling fine.");
+			healthStatus.append(this.name + "\t" + "is feeling fine.");
 		} else if (strength > 0.6 * maxHealth) {
-			System.out.print(this.name + "\t" + "might wanna check with a doctor.");
+			healthStatus.append(this.name + "\t" + "might wanna check with a doctor.");
 		} else if (strength > 0.3 * maxHealth) {
-			System.out.print(this.name + "\t" + "looks really, really unwell.");
+			healthStatus.append(this.name + "\t" + "looks really, really unwell.");
 		} else if (strength > 0) {
-			System.out.print(this.name + "\t" + "is on the brink of death.");
+			healthStatus.append(this.name + "\t" + "is on the brink of death.");
 		} else {
-			System.out.print(this.name + "\t" + "has stopped breathing.");
+			healthStatus.append(this.name + "\t" + "has stopped breathing.");
 		}
-		System.out.println();
+		LOG.debug(healthStatus);
 	}
 
 	private void takeWound(double damage) {
-		System.out.print(name + "\t" + "has taken ");
-		if (damage <= 0) {
-			System.out.print("no");
+		StringBuilder damageTaken = new StringBuilder();
+		damageTaken.append(name + "\t" + "has taken ");
+		if (damage == 0) {
+			damageTaken.append("no");
 		} else if (damage < (0.05 * maxHealth)) {
 			woundsSuperficial++;
-			System.out.print("small");
+			damageTaken.append("small");
 		} else if (damage < (0.15 * maxHealth)) {
 			woundsDeep++;
-			System.out.print("some");
+			damageTaken.append("some");
 		} else if (damage < (0.45 * maxHealth)) {
 			woundsCritical++;
-			System.out.print("lots of");
+			damageTaken.append("lots of");
 		} else if (damage < maxHealth) {
 			woundsBrutal++;
-			System.out.print("brutal");
+			damageTaken.append("brutal");
 		} else if (damage >= maxHealth) {
 			woundsDisastrous++;
-			System.out.print("potentially leathal");
+			damageTaken.append("potentially leathal");
+		} else {
+			damageTaken.append(" WEIRD ");
 		}
-		System.out.println(" damage.");
+		damageTaken.append(" damage.");
+		LOG.debug(damageTaken);
 	}
 
 	public double getOverallStrength() {
@@ -238,17 +256,14 @@ public class Fighter {
 		double breakDown = 1;
 		if (motivators != 0) {
 			breakDown = 1 - 1 / (motivators + 1);
-//			System.out.println(breakDown + "<brkdn <<<");
 			honor *= breakDown;
 		}
 
 		double minusLazy = lazyRounds;
 		honor -= minusLazy;
-//		System.out.println(minusLazy + "<minusLazy <<<");
 	}
 
 	private double decideImportance() {
-//		System.out.println(name + " is motivated: " + motivators + " x (" + chickenDinner() + "+1) x " + roundsFought);
 		return motivators * (chickenDinner() * +1) * roundsFought;
 	}
 
@@ -262,25 +277,29 @@ public class Fighter {
 	}
 
 	private void situationStats() {
-		System.out.print(name + "\t");
+		StringBuilder situation = new StringBuilder();
+		situation.append(name + "\t");
 		if (dead) {
-			System.out.print("had ");
+			situation.append("had ");
 		} else {
-			System.out.print("has ");
+			situation.append("has ");
 		}
-		System.out.println((int) strength + " of " + (int) maxHealth + " left: " + getStrengthStats());
+
+		situation.append((int) strength + " of " + (int) maxHealth + " left: ");
+		situation.append(getStrengthStats());
+		LOG.debug(situation);
 	}
 
 	private void winnerStats() {
 		sortChickens();
 		if (wonAgainstCleanedUp.size() == 1) {
-			System.out.println(detailSituation() + " opponent: " + wonAgainstCleanedUp);
+			LOG.debug(detailSituation() + " opponent: " + wonAgainstCleanedUp);
 		} else if (wonAgainstCleanedUp.size() > 1) {
-			System.out.println(detailSituation() + " opponents: " + wonAgainstCleanedUp);
+			LOG.debug(detailSituation() + " opponents: " + wonAgainstCleanedUp);
 		} else if (roundsFought > 1) {
-			System.out.println("In " + howManyFightsThough() + ", " + name + "\t" + "has never won.");
+			LOG.debug("In " + howManyFightsThough() + ", " + name + "\t" + "has never won.");
 		} else {
-			System.out.println(name + "\t" + "has lost the first and only fight.");
+			LOG.debug(name + "\t" + "has lost the first and only fight.");
 		}
 	}
 
@@ -293,7 +312,7 @@ public class Fighter {
 	}
 
 	private void sortChickens() {
-		wonAgainstCleanedUp = new ArrayList<Fighter>(new HashSet<Fighter>(wonAgainst));
+		wonAgainstCleanedUp = new ArrayList<>(new HashSet<Fighter>(wonAgainst));
 		loosers = wonAgainstCleanedUp.size();
 	}
 
@@ -313,25 +332,23 @@ public class Fighter {
 	}
 
 	private void finalStats(int highScoreHonor) {
+		StringBuilder kindOfDeath = new StringBuilder();
 		String wayOfEnding = "fought";
 		if (dead)
 			wayOfEnding = "died";
 		if (honor <= 0) {
-			System.out.print(name + "\t" + "has " + wayOfEnding + " without honor");
+			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " without honor");
 		} else if (honor > highScoreHonor * 0.3) {
-			System.out.print(name + "\t" + "has " + wayOfEnding + " like a hero");
+			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " like a hero");
 		} else if (honor > highScoreHonor * 0.1) {
-			System.out.print(name + "\t" + "has " + wayOfEnding + " like a champion");
+			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " like a champion");
 		} else if (honor > highScoreHonor * 0.01) {
-			System.out.print(name + "\t" + "has " + wayOfEnding + " bravely");
+			kindOfDeath.append(name + "\t" + "has " + wayOfEnding + " bravely");
 		} else if (honor > 0) {
-			System.out.print(name + "\t" + "has died in vane");
+			kindOfDeath.append(name + "\t" + "has died in vane");
 		}
-		stateLastRound();
-	}
-
-	private void stateLastRound() {
-		System.out.print(" in round " + survivedRounds + ".\t");
+		kindOfDeath.append(" in round " + survivedRounds + ".\t");
+		LOG.debug(kindOfDeath);
 	}
 
 	public int countWounds() {
@@ -373,7 +390,7 @@ public class Fighter {
 
 		}
 		if (bloodLostSoFar > 0) {
-			System.out.println(pokies);
+			LOG.debug(pokies);
 		}
 		return woundCount;
 	}
@@ -413,23 +430,23 @@ public class Fighter {
 	}
 
 	String getStrengthStats() {
-		return "[" + (int) this.strength + "+" + (int) this.getWeaponStrength() + "x" + (int) adjustedTalent + "]";
+		return "[" + (int) this.strength + "+" + this.getWeaponStrength() + "x" + (int) adjustedTalent + "]";
 	}
 
 	public void heal(double amount) {
 		if (strength < maxHealth) {
-			System.out.println("Doctor Appointment!");
+			LOG.debug("Doctor Appointment!");
 		}
 		strength += amount;
 		if (strength > maxHealth) {
 			double excessAmount = strength - maxHealth;
 			strength = maxHealth;
 			if (excessAmount > 0) {
-				System.out.println("Attempting bandaging..." + (int) excessAmount);
+				LOG.debug("Attempting bandaging..." + (int) excessAmount);
 				bandage(excessAmount);
 			}
 		} else if (strength <= 0) {
-			System.out.println(name + " couln't be helped anymore." + strength + "." + amount);
+			LOG.debug(name + " couln't be helped anymore." + strength + "." + amount);
 		}
 	}
 
@@ -442,31 +459,31 @@ public class Fighter {
 		if (woundsDisastrous > 0 && bandage >= maxHealth) {
 			woundsDisastrous--;
 			bandage = 0;
-			System.out.println("Now it's a Frankenfighter.");
+			LOG.debug("Now it's a Frankenfighter.");
 		}
 		while (woundsBrutal > 0 && bandage >= brutalKit) {
 			woundsBrutal--;
 			bandage -= brutalKit;
-			System.out.println("Reassembling limbs.");
+			LOG.debug("Reassembling limbs.");
 		}
 		while (woundsCritical > 0 && bandage >= criticalKit) {
 			woundsCritical--;
 			bandage -= criticalKit;
-			System.out.println("Fixing some broken stuff.");
+			LOG.debug("Fixing some broken stuff.");
 		}
 		while (woundsDeep > 0 && bandage >= deepKit) {
 			woundsDeep--;
 			bandage -= deepKit;
-			System.out.println("Treating a cut.");
+			LOG.debug("Treating a cut.");
 		}
 		while (woundsSuperficial > 0 && bandage >= superficialKit) {
 			woundsSuperficial--;
 			bandage -= superficialKit;
-			System.out.println("Mending a scratch.");
+			LOG.debug("Mending a scratch.");
 		}
 
 		if (bandage > 0) {
-			System.out.println("Bandage could not be used fully.");
+			LOG.debug("Bandage could not be used fully.");
 		}
 	}
 
