@@ -26,58 +26,49 @@ public class NameGenerator {
 	private Random r = new Random();
 	private boolean doubleBool = false;
 	private boolean trippleBool = false;
-	private boolean startWithVowel = false;
-	// TODO first not fully functional, double
-	// letters can occur even if !multiple
-	private boolean first = false;
-	private String doubleChar = "";
-	private String trippleChar = "";
-	private String vowelStart = "";
 	private String vowelEnd = "";
-	private String consonantStart = "";
-	private String consonantEnd = "";
 	private double extentionChance = 0;
 	private int wordLength = 0;
 
 	public String generateNameAdv() {
-		String ret = "";
+		StringBuilder ret = new StringBuilder();
 		String ch = "";
+
 		for (int i = 0; i < wordLength; i++) {
+			setDoubleTripple();
 			if (i == 0) {
-				first = true;
-				setDoubleTripple();
-				if (startWithVowel) {
+				if (startWithVowel()) {
 					ch = generateVowel(true);
 				} else {
 					ch = generateConsonant(true);
 				}
-				first = false;
 			} else {
-				setDoubleTripple();
-				if (i % 2 == 0) {
-					if (startWithVowel) {
-						ch = generateVowel(false);
-					} else {
-						ch = generateConsonant(false);
-					}
-				} else {
-					if (!startWithVowel) {
-						ch = generateVowel(false);
-					} else {
-						ch = generateConsonant(false);
-					}
-				}
+				ch = addSmallLetter(i % 2 == 0);
 			}
-			ret += ch;
+			ret.append(ch);
 
 			if (Math.random() <= extentionChance) {
 				wordLength++;
 			}
 		}
-		return ret;
+		return ret.toString();
+	}
+
+	private String addSmallLetter(boolean decision) {
+		if (decision) {
+			return generateVowel(false);
+		} else {
+			return generateConsonant(false);
+		}
+	}
+
+	private boolean startWithVowel() {
+		return r.nextBoolean();
 	}
 
 	private String generateVowel(boolean caps) {
+		String doubleChar = "";
+		String trippleChar = "";
 		if (caps) {
 			if (doubleBool) {
 				if (trippleBool) {
@@ -85,7 +76,7 @@ public class NameGenerator {
 				}
 				doubleChar = "" + vowels.charAt(r.nextInt(vowels.length())) + trippleChar;
 			}
-			return vowelStart + vowelsCAP.charAt(r.nextInt(vowelsCAP.length())) + doubleChar + vowelEnd;
+			return vowelsCAP.charAt(r.nextInt(vowelsCAP.length())) + doubleChar + vowelEnd;
 		} else {
 			if (doubleBool) {
 				if (trippleBool) {
@@ -93,11 +84,13 @@ public class NameGenerator {
 				}
 				doubleChar = "" + vowels.charAt(r.nextInt(vowels.length())) + trippleChar;
 			}
-			return vowelStart + vowels.charAt(r.nextInt(vowels.length())) + doubleChar + vowelEnd;
+			return vowels.charAt(r.nextInt(vowels.length())) + doubleChar + vowelEnd;
 		}
 	}
 
 	private String generateConsonant(boolean caps) {
+		String doubleChar = "";
+		String trippleChar = "";
 		if (caps) {
 			if (doubleBool) {
 				if (trippleBool) {
@@ -105,7 +98,7 @@ public class NameGenerator {
 				}
 				doubleChar = "" + consonants.charAt(r.nextInt(consonants.length())) + trippleChar;
 			}
-			return consonantStart + consonantsCAP.charAt(r.nextInt(consonantsCAP.length())) + doubleChar + consonantEnd;
+			return consonantsCAP.charAt(r.nextInt(consonantsCAP.length())) + doubleChar;
 		} else {
 			if (doubleBool) {
 				if (trippleBool) {
@@ -114,21 +107,15 @@ public class NameGenerator {
 				doubleChar = "" + consonants.charAt(r.nextInt(consonants.length())) + trippleChar;
 
 			}
-			return consonantStart + consonants.charAt(r.nextInt(consonants.length())) + doubleChar + consonantEnd;
+			return consonants.charAt(r.nextInt(consonants.length())) + doubleChar;
 		}
 	}
 
 	private void setDoubleTripple() {
 		doubleBool = false;
 		trippleBool = false;
-		doubleChar = "";
-		trippleChar = "";
 		double dblCh = 0.15;
 		double trplCh = 0.15;
-
-		if (first) {
-			startWithVowel = r.nextBoolean();
-		}
 
 		if (multiple && r.nextDouble() < dblCh) {
 			doubleBool = true;
@@ -137,49 +124,6 @@ public class NameGenerator {
 			}
 
 		}
-	}
-
-	@Deprecated
-	public String nameNumber() {
-		int ran = r.nextInt(10000);
-		return ran + "";
-	}
-
-	@Deprecated
-	public String generateName() {
-		String ret = "";
-		String ch;
-		int nLength = r.nextInt(8) + 2;
-		startWithVowel = false;
-		if (Math.random() > 0.5) {
-			startWithVowel = true;
-		}
-		for (int i = 0; i < nLength; i++) {
-			if (i == 0) {
-				if (startWithVowel) {
-					ch = generateVowel(true);
-				} else {
-					ch = generateConsonant(true);
-				}
-			} else {
-				if (i % 2 == 0) {
-					if (startWithVowel) {
-						ch = generateVowel(false);
-					} else {
-						ch = generateConsonant(false);
-					}
-				} else {
-					if (startWithVowel) {
-						ch = generateConsonant(false);
-					} else {
-						ch = generateVowel(false);
-					}
-				}
-			}
-			String chStr = "" + ch;
-			ret += chStr;
-		}
-		return ret;
 	}
 
 	public boolean compareToWantedName(String name, List<String> nameList) {
