@@ -14,6 +14,7 @@ public class Arena {
 	private static final String SIGNBOARDEMPTY = ">---------------------------------------------------<";
 
 	private List<Fighter> fighters = new ArrayList<>();
+	// TODO change weapons to own class
 	private List<Integer> weapons = new ArrayList<>();
 	private List<Fighter> chronicles = new ArrayList<>();
 	private int highScoreHonor;
@@ -108,8 +109,6 @@ public class Arena {
 
 			round++;
 			LOG.debug("---------------------- round " + round + " ---------------------- ");
-			spreadTheBlood();
-			removeDead();
 			motivateTheLiving();
 
 			LOG.debug("Living fighters: " + fighters);
@@ -123,6 +122,7 @@ public class Arena {
 				int b = findOtherFighter(a);
 				fight(a, b);
 			}
+			spreadTheBlood();
 			removeDead();
 		}
 		wrapItUp();
@@ -281,7 +281,7 @@ public class Arena {
 	}
 
 	private Integer defineDanger() {
-		return new Integer(r.nextInt(varietyOfWeapons) + minimumBluntness);
+		return r.nextInt(varietyOfWeapons) + minimumBluntness;
 	}
 
 	private void fight(int i, int j) {

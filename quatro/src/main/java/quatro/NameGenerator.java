@@ -32,8 +32,6 @@ public class NameGenerator {
 	private boolean first = false;
 	private String doubleChar = "";
 	private String trippleChar = "";
-	private String ret = "";
-	private String ch;
 	private String vowelStart = "";
 	private String vowelEnd = "";
 	private String consonantStart = "";
@@ -42,7 +40,8 @@ public class NameGenerator {
 	private int wordLength = 0;
 
 	public String generateNameAdv() {
-		ret = "";
+		String ret = "";
+		String ch = "";
 		for (int i = 0; i < wordLength; i++) {
 			if (i == 0) {
 				first = true;
@@ -122,29 +121,27 @@ public class NameGenerator {
 	private void setDoubleTripple() {
 		doubleBool = false;
 		trippleBool = false;
-		double dbl = r.nextDouble();
-		double trpl = r.nextDouble();
-		double dblCh = 0.15;
-		double trplCh = 0.15;
 		doubleChar = "";
 		trippleChar = "";
+		double dblCh = 0.15;
+		double trplCh = 0.15;
+
 		if (first) {
 			startWithVowel = r.nextBoolean();
 		}
 
-		if (multiple) {
-			if (dbl < dblCh) {
-				doubleBool = true;
-				if (trpl < trplCh) {
-					trippleBool = true;
-				}
+		if (multiple && r.nextDouble() < dblCh) {
+			doubleBool = true;
+			if (r.nextDouble() < trplCh) {
+				trippleBool = true;
 			}
+
 		}
 	}
 
 	@Deprecated
 	public String nameNumber() {
-		int ran = (int) (Math.random() * 10000);
+		int ran = r.nextInt(10000);
 		return ran + "";
 	}
 
@@ -152,8 +149,8 @@ public class NameGenerator {
 	public String generateName() {
 		String ret = "";
 		String ch;
-		int nLength = (int) (Math.random() * 8) + 2;
-		boolean startWithVowel = false;
+		int nLength = r.nextInt(8) + 2;
+		startWithVowel = false;
 		if (Math.random() > 0.5) {
 			startWithVowel = true;
 		}
@@ -189,9 +186,6 @@ public class NameGenerator {
 		for (String str : nameList) {
 			if (name.equalsIgnoreCase(str))
 				return true;
-			// if (name.compareTo(str) == str.length()) {
-			// System.err.print(name.compareTo(str));
-			// }
 		}
 		return false;
 	}

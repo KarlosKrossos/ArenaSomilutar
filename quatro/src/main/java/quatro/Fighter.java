@@ -100,9 +100,7 @@ public class Fighter {
 
 	@Override
 	public String toString() {
-//		String detailedName = name + "{H" + honor + "," + Math.round(strength) + "}";
-		String detailedName = name + getStrengthStats();
-		return detailedName;
+		return name + getStrengthStats();
 	}
 
 	private void setName() {
@@ -115,7 +113,6 @@ public class Fighter {
 
 	public void weakenDueToBattle(double opponentStrength) throws DroppedWeaponException {
 
-		double before = strength;
 		if (opponentStrength > 0) {
 			lazyRounds = 0;
 			roundsFought++;
@@ -127,23 +124,23 @@ public class Fighter {
 		}
 
 		suffer();
-		healthStats(before, strength);
+		healthStats();
 	}
 
 	private double calculateDamage(double opponentStrength) throws DroppedWeaponException {
 		double danger = opponentStrength / getOverallStrength();
-//		if (danger > 0.5 && Math.random() > 0.5) {
-//			dropWeapon();
-//		}
+		if (danger > 0.5 && Math.random() > 0.5) {
+			dropWeapon();
+		}
 		return danger * opponentStrength / getOverallStrength();
 	}
 
 	private double calculateGainOfHonor(double damageTaken) {
 		int gainOfHonor;
 		if (damageTaken > 1) {
-			gainOfHonor = (int) (decideImportance() * damageTaken);
+			gainOfHonor = decideImportance() * (int) damageTaken;
 		} else {
-			gainOfHonor = (int) (decideImportance());
+			gainOfHonor = decideImportance();
 		}
 
 		if (gainOfHonor <= 0)
@@ -166,9 +163,7 @@ public class Fighter {
 	}
 
 	public void bleedingStats(double bleeding) {
-		if (bleeding == 0) {
-			// LOG.debug(this.name + " has flawless skin.");
-		} else if (bleeding < 0.3 && bleeding > 0) {
+		if (bleeding < 0.3 && bleeding > 0) {
 			LOG.debug(this.name + "\t" + "has some scratches.");
 		} else if (bleeding < 1) {
 			LOG.debug(this.name + "\t" + "is bleeding.");
@@ -181,7 +176,7 @@ public class Fighter {
 		}
 	}
 
-	private void healthStats(double before, double after) {
+	private void healthStats() {
 		StringBuilder healthStatus = new StringBuilder();
 		if (strength > 0.9 * maxHealth) {
 			healthStatus.append(this.name + "\t" + "is feeling fine.");
@@ -200,7 +195,9 @@ public class Fighter {
 	private void takeWound(double damage) {
 		StringBuilder damageTaken = new StringBuilder();
 		damageTaken.append(name + "\t" + "has taken ");
-		if (damage == 0) {
+		if (damage < 0) {
+			damageTaken.append("negative?");
+		} else if (damage == 0) {
 			damageTaken.append("no");
 		} else if (damage < (0.05 * maxHealth)) {
 			woundsSuperficial++;
@@ -214,11 +211,9 @@ public class Fighter {
 		} else if (damage < maxHealth) {
 			woundsBrutal++;
 			damageTaken.append("brutal");
-		} else if (damage >= maxHealth) {
+		} else {
 			woundsDisastrous++;
 			damageTaken.append("potentially leathal");
-		} else {
-			damageTaken.append(" WEIRD ");
 		}
 		damageTaken.append(" damage.");
 		LOG.debug(damageTaken);
@@ -255,7 +250,7 @@ public class Fighter {
 		lazyRounds++;
 		double breakDown = 1;
 		if (motivators != 0) {
-			breakDown = 1 - 1 / (motivators + 1);
+			breakDown = 1 - 1.0 / (motivators + 1);
 			honor *= breakDown;
 		}
 
@@ -263,8 +258,8 @@ public class Fighter {
 		honor -= minusLazy;
 	}
 
-	private double decideImportance() {
-		return motivators * (chickenDinner() * +1) * roundsFought;
+	private int decideImportance() {
+		return motivators * (chickenDinner() + 1) * roundsFought;
 	}
 
 	public int getHonor() {
@@ -410,7 +405,9 @@ public class Fighter {
 	}
 
 	private String countDrops() {
-		if (bloodLostSoFar == 0) {
+		if (bloodLostSoFar < 0) {
+			return "negative amounts? of";
+		} else if (bloodLostSoFar == 0) {
 			return "not even a single drop of";
 		} else if (bloodLostSoFar < 0.1 * maxHealth) {
 			return "some";
@@ -420,12 +417,8 @@ public class Fighter {
 			return "a lot of";
 		} else if (bloodLostSoFar <= maxHealth) {
 			return "waaaay too much";
-		} else if (bloodLostSoFar > maxHealth) {
-			return "unbelievable amounts of";
-		} else if (bloodLostSoFar < 0) {
-			return "negative amounts? of";
 		} else {
-			return "WTF WTF";
+			return "unbelievable amounts of";
 		}
 	}
 

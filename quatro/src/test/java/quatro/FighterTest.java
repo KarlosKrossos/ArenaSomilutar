@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 public class FighterTest {
 
+	// TODO LOG instead of syso
+
 	@Test
 	public void newFighterHasNoWeapon() {
 		System.out.println("+++++newFighterHasNoWeapon++++++");
@@ -31,8 +33,7 @@ public class FighterTest {
 		System.out.println("+++++fighterGetsStrongerWithWeapon++++++");
 		Fighter noob = new Fighter();
 		double strengthUnarmed = noob.getOverallStrength();
-		Integer iih = new Integer(10);
-		noob.pickUpWeapon(iih);
+		noob.pickUpWeapon(10);
 		double strengthWithWeapon = noob.getOverallStrength();
 		assertTrue(strengthWithWeapon > strengthUnarmed);
 	}
@@ -42,33 +43,28 @@ public class FighterTest {
 		System.out.println("+++++fighterTakesBetterWeapon++++++");
 		Fighter noob = new Fighter();
 		double strengthUnarmed = noob.getOverallStrength();
-		Integer iih = new Integer(10);
-		noob.pickUpWeapon(iih);
+		noob.pickUpWeapon(10);
 		double strengthWithWeapon = noob.getOverallStrength();
 		assertTrue(strengthWithWeapon > strengthUnarmed);
 
-		iih = new Integer(20);
-		Integer theDrop = noob.pickUpWeapon(iih);
+		Integer theDrop = noob.pickUpWeapon(20);
 		assertNotNull(theDrop);
 		assertEquals(10, theDrop.intValue());
 
-		iih = new Integer(10);
-		theDrop = noob.pickUpWeapon(iih);
+		theDrop = noob.pickUpWeapon(10);
 		assertNotNull(theDrop);
 		assertEquals(10, theDrop.intValue());
 
-		iih = new Integer(20);
-		theDrop = noob.pickUpWeapon(iih);
+		theDrop = noob.pickUpWeapon(20);
 		assertNotNull(theDrop);
 		assertEquals(20, theDrop.intValue());
 
-		iih = null;
-		theDrop = noob.pickUpWeapon(iih);
+		theDrop = noob.pickUpWeapon(null);
 		assertNull(theDrop);
 		assertEquals(20, noob.getWeaponStrength());
 
-		iih = 0;
-		theDrop = noob.pickUpWeapon(iih);
+		Integer iih = 0;
+		theDrop = noob.pickUpWeapon(0);
 		assertEquals(iih, theDrop);
 		assertEquals(20, noob.getWeaponStrength());
 
@@ -196,8 +192,8 @@ public class FighterTest {
 			assertTrue(fighter.getHonor() >= 0);
 		}
 		System.out.println("hodor:" + fighter.getHonor());
-		assertTrue(fighter.getHonor() < 1000);
-		assertTrue(fighter.getHonor() > 900);
+		assertTrue(fighter.getHonor() < 1050);
+		assertTrue(fighter.getHonor() > 1000);
 
 	}
 
@@ -219,8 +215,8 @@ public class FighterTest {
 			assertTrue(fighter.getHonor() >= 0);
 		}
 		System.out.println("hodor:" + fighter.getHonor());
-		assertTrue(fighter.getHonor() < 150);
-		assertTrue(fighter.getHonor() > 100);
+		assertTrue(fighter.getHonor() < 200);
+		assertTrue(fighter.getHonor() > 150);
 	}
 
 	@Test

@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 public class ArenaTest {
+	
+	// TODO mock fighter
+	// TODO LOG instead of syso
 
 	@Test
 	public void arenaHasNoFightersAtStart() {
@@ -108,7 +111,7 @@ public class ArenaTest {
 		arena.requestEnterance(stronger);
 		arena.lastManStanding();
 		assertEquals(0, opfer.chickenDinner());
-		assertTrue(stronger.chickenDinner() > 1);
+		assertTrue(stronger.chickenDinner() > 0);
 
 	}
 
