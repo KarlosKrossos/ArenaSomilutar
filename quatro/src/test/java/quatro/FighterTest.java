@@ -80,13 +80,13 @@ public class FighterTest {
 		double health = noob.getStrength();
 
 		try {
-			noob.weakenDueToBattle(0);
+			noob.battle(0);
 		} catch (DroppedWeaponException e1) {
 		}
 		assertEquals(0, noob.getHonor());
 
 		try {
-			noob.weakenDueToBattle(-1);
+			noob.battle(-1);
 		} catch (DroppedWeaponException e) {
 		}
 		assertEquals(0, noob.getHonor());
@@ -101,14 +101,14 @@ public class FighterTest {
 		System.out.println(noob.getHonor());
 
 		try {
-			noob.weakenDueToBattle(1);
+			noob.battle(1);
 		} catch (DroppedWeaponException e1) {
 		}
 		assertNotEquals(0, noob.getHonor());
 		assertNotEquals(maxHealth, noob.getStrength());
 
 		try {
-			noob.weakenDueToBattle(1000);
+			noob.battle(1000);
 		} catch (DroppedWeaponException e) {
 		}
 		assertTrue(noob.getHonor() > 0);
@@ -139,7 +139,7 @@ public class FighterTest {
 		noob = new Fighter();
 		health = noob.getStrength();
 		try {
-			noob.weakenDueToBattle(health * 0.8);
+			noob.battle(health * 0.8);
 		} catch (DroppedWeaponException e) {
 		}
 		int hodor = noob.getHonor();
@@ -161,7 +161,7 @@ public class FighterTest {
 		while (fighter.getStrength() >= 0) {
 			System.out.println(fighter.getStrength() + " <---- " + foeStrength);
 			try {
-				fighter.weakenDueToBattle(foeStrength);
+				fighter.battle(foeStrength);
 			} catch (DroppedWeaponException e) {
 			}
 			fighter.praise(new Fighter(foeStrength));
@@ -170,7 +170,8 @@ public class FighterTest {
 			assertTrue(fighter.getHonor() >= 0);
 		}
 		System.out.println("hodor:" + fighter.getHonor());
-		assertTrue(fighter.getHonor() < 100);
+		assertTrue(fighter.getHonor() > 450);
+		assertTrue(fighter.getHonor() < 500);
 
 	}
 
@@ -184,7 +185,8 @@ public class FighterTest {
 		while (fighter.getStrength() >= 0) {
 			System.out.println(fighter.getStrength() + " <---- " + foeStrength);
 			try {
-				fighter.weakenDueToBattle(foeStrength);
+				fighter.battle(foeStrength);
+				fighter.suffer();
 			} catch (DroppedWeaponException e) {
 			}
 			fighter.praise(new Fighter(foeStrength));
@@ -207,7 +209,7 @@ public class FighterTest {
 		while (fighter.getStrength() >= 0) {
 			System.out.println(fighter.getStrength() + " <---- " + foeStrength);
 			try {
-				fighter.weakenDueToBattle(foeStrength);
+				fighter.battle(foeStrength);
 			} catch (DroppedWeaponException e) {
 			}
 			fighter.praise(new Fighter(foeStrength));
@@ -215,8 +217,8 @@ public class FighterTest {
 			assertTrue(fighter.getHonor() >= 0);
 		}
 		System.out.println("hodor:" + fighter.getHonor());
-		assertTrue(fighter.getHonor() < 200);
-		assertTrue(fighter.getHonor() > 150);
+		assertTrue(fighter.getHonor() < 250);
+		assertTrue(fighter.getHonor() > 200);
 	}
 
 	@Test
@@ -229,7 +231,7 @@ public class FighterTest {
 		while (fighter.getStrength() >= 0) {
 			System.out.println(fighter.getStrength() + " <---- " + foeStrength);
 			try {
-				fighter.weakenDueToBattle(foeStrength);
+				fighter.battle(foeStrength);
 			} catch (DroppedWeaponException e) {
 			}
 			fighter.praise(new Fighter(foeStrength));
@@ -249,7 +251,7 @@ public class FighterTest {
 		int hodor = winner.getHonor();
 
 		try {
-			winner.weakenDueToBattle(10);
+			winner.battle(10);
 		} catch (DroppedWeaponException e1) {
 		}
 		assertTrue(winner.getHonor() >= hodor);
@@ -259,7 +261,7 @@ public class FighterTest {
 			winner.heal(200);
 
 			try {
-				winner.weakenDueToBattle(i);
+				winner.battle(i);
 			} catch (DroppedWeaponException e) {
 			}
 			if (i < maxHealth) {
@@ -280,7 +282,7 @@ public class FighterTest {
 			winner.heal(200);
 			winner.praise(new Fighter(0));
 			try {
-				winner.weakenDueToBattle(10);
+				winner.battle(10);
 			} catch (DroppedWeaponException e) {
 			}
 			int gained = winner.getHonor() - hodor;
@@ -298,7 +300,7 @@ public class FighterTest {
 
 		for (int i = 10; i > 0; i--) {
 			try {
-				cutPuppet.weakenDueToBattle(10);
+				cutPuppet.battle(10);
 			} catch (DroppedWeaponException e) {
 			}
 			diff = maxHealth - cutPuppet.getStrength();
@@ -321,7 +323,7 @@ public class FighterTest {
 			assertEquals(0, cutPuppet.countWounds());
 
 			try {
-				cutPuppet.weakenDueToBattle(i * 10);
+				cutPuppet.battle(i * 10);
 			} catch (DroppedWeaponException e) {
 			}
 			assertEquals(1, cutPuppet.countWounds());
@@ -342,7 +344,7 @@ public class FighterTest {
 		double expectedBleeding = 10;
 
 		try {
-			cutPuppet.weakenDueToBattle(40);
+			cutPuppet.battle(40);
 		} catch (DroppedWeaponException e) {
 		}
 

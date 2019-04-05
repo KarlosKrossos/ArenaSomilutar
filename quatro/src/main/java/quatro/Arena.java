@@ -125,7 +125,7 @@ public class Arena {
 			spreadTheBlood();
 			removeDead();
 		}
-		wrapItUp();
+		listChronicleEntries();
 	}
 
 	private int findOtherFighter(int a) {
@@ -152,10 +152,6 @@ public class Arena {
 		for (Fighter f : fighters) {
 			f.doNotBeLazy(fighters.size() - 1);
 		}
-	}
-
-	private void wrapItUp() {
-		listChronicleEntries();
 	}
 
 	private void listChronicleEntries() {
@@ -302,8 +298,8 @@ public class Arena {
 		s.praise(w);
 
 		try {
-			w.weakenDueToBattle(aOverallStrength);
-			s.weakenDueToBattle(bOverallStrength);
+			w.battle(aOverallStrength);
+			s.battle(bOverallStrength);
 		} catch (DroppedWeaponException e) {
 			if (null != e.getWeapon())
 				weapons.add(e.getWeapon());

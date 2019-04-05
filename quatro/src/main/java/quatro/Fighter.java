@@ -111,7 +111,7 @@ public class Fighter {
 		name = ng.generateNameAdv();
 	}
 
-	public void weakenDueToBattle(double opponentStrength) throws DroppedWeaponException {
+	public void battle(double opponentStrength) throws DroppedWeaponException {
 
 		if (opponentStrength > 0) {
 			lazyRounds = 0;
@@ -123,7 +123,6 @@ public class Fighter {
 			takeWound(damageTaken);
 		}
 
-		suffer();
 		healthStats();
 	}
 
@@ -312,9 +311,6 @@ public class Fighter {
 	}
 
 	private String howManyFightsThough() {
-		if (roundsFought == 0) {
-			return ", ever.";
-		}
 		String thisMany = roundsFought + " round";
 		if (roundsFought != 1) {
 			thisMany += "s";
@@ -416,9 +412,9 @@ public class Fighter {
 		} else if (bloodLostSoFar < 0.5 * maxHealth) {
 			return "a lot of";
 		} else if (bloodLostSoFar <= maxHealth) {
-			return "waaaay too much";
+			return "horrible amounts of";
 		} else {
-			return "unbelievable amounts of";
+			return "impossible amounts of";
 		}
 	}
 
